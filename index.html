@@ -2,213 +2,339 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>語音翻譯工作站</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&family=Noto+Sans+Thai:wght@500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Echo 2.0 — 未來感語音翻譯</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0f1a;
-            --card-bg: #161b2b;
-            --primary: #38bdf8;
-            --text-main: #ffffff;
+            --bg-main: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #06b6d4;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --error: #f43f5e;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Noto Sans TC', 'Noto Sans Thai', sans-serif;
-            background: var(--bg); color: var(--text-main);
-            margin: 0; padding: 10px; min-height: 100vh;
-            display: flex; justify-content: center;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.15) 0%, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
         }
 
-        .container { width: 100%; max-width: 600px; padding-bottom: 140px; }
-
-        /* 安全警告 */
-        #alert-box {
-            background: rgba(244, 63, 94, 0.15); border: 1px solid var(--error);
-            color: #ff8095; padding: 12px; border-radius: 12px; margin-bottom: 20px;
-            display: none; text-align: center; font-size: 0.9rem;
+        /* ─── Header ─── */
+        header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        header { text-align: center; padding: 25px 0; }
-        header h1 { 
-            font-size: 1.8rem; margin: 0; letter-spacing: 2px; 
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(to right, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
 
-        /* 人性化語系選擇卡片 */
-        .lang-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px;
+        /* ─── Main Container ─── */
+        .container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
+        /* ─── Language Switcher ─── */
         .lang-card {
-            background: var(--card-bg); border: 2px solid #2d3748; border-radius: 16px;
-            padding: 12px 5px; text-align: center; cursor: pointer; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(12px);
         }
 
-        .lang-card.active {
-            border-color: var(--primary); background: rgba(56, 189, 248, 0.1);
-            transform: scale(1.05);
+        .lang-select-group {
+            text-align: center;
+            flex: 1;
         }
 
-        .lang-card .flag { font-size: 1.5rem; display: block; margin-bottom: 5px; }
-        .lang-card .name { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
-        .lang-card.active .name { color: var(--primary); }
-
-        /* 內容顯示區 */
-        .display-panel {
-            background: var(--card-bg); border-radius: 24px; padding: 20px;
-            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .lang-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
 
-        .panel-label {
-            font-size: 0.75rem; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+        select {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            text-align-last: center;
+            outline: none;
         }
 
-        .output-text {
-            font-size: 1.4rem; line-height: 1.6; min-height: 70px;
-            word-break: break-all; color: var(--text-main);
+        .swap-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
         }
 
-        .translation-text { color: var(--primary); font-weight: 500; }
+        /* ─── Translation Display ─── */
+        .display-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-        /* 底部控制欄 */
-        .footer-controls {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(11, 15, 26, 0.9); backdrop-filter: blur(15px);
-            padding: 25px 20px; border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column; align-items: center;
+        .bubble {
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            position: relative;
+            line-height: 1.6;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .bubble-src {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .bubble-target {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-top-right-radius: 4px;
+            min-height: 120px;
+            font-weight: 500;
+        }
+
+        /* ─── Mic Control ─── */
+        .control-section {
+            margin-top: auto;
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mic-wrapper {
+            position: relative;
+            width: 80px; height: 80px;
         }
 
         .mic-btn {
-            width: 100%; max-width: 380px; height: 60px;
-            border-radius: 30px; border: none; font-size: 1.2rem; font-weight: 700;
-            background: var(--primary); color: #000; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: 0.3s; box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: none;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 2;
+            position: relative;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            transition: transform 0.2s, background 0.3s;
         }
 
-        .mic-btn.recording {
-            background: var(--error); color: white;
-            box-shadow: 0 0 20px rgba(244, 63, 92, 0.4);
+        .mic-btn.active {
+            background: #ef4444;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            transform: scale(0.9);
         }
 
-        .mic-btn:active { transform: scale(0.96); }
+        .pulse-ring {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .active + .pulse-ring {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        /* ─── Visualizer ─── */
+        .visualizer {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 20px;
+        }
+        .bar {
+            width: 3px; height: 100%;
+            background: var(--accent-secondary);
+            border-radius: 2px;
+            animation: quiet 0.5s infinite;
+        }
+        @keyframes quiet {
+            0%, 100% { height: 4px; }
+            50% { height: 15px; }
+        }
+
+        /* ─── Tabs/Nav ─── */
+        .bottom-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-item.active { color: var(--accent-secondary); }
+
+        /* PC 調整 */
+        @media (min-width: 768px) {
+            .container { padding-top: 40px; }
+            .bubble { font-size: 22px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="alert-box">請確保使用 HTTPS 網址或 localhost 開啟，否則無法啟用麥克風。</div>
-
     <header>
-        <h1>語音翻譯工作站</h1>
+        <div class="logo">ECHO</div>
+        <div class="visualizer" id="viz">
+            <div class="bar" style="animation-delay: 0.1s"></div>
+            <div class="bar" style="animation-delay: 0.2s"></div>
+            <div class="bar" style="animation-delay: 0.3s"></div>
+            <div class="bar" style="animation-delay: 0.4s"></div>
+            <div class="bar" style="animation-delay: 0.5s"></div>
+        </div>
     </header>
 
-    <div class="lang-grid">
-        <div class="lang-card active" onclick="changeLang('en', this)">
-            <span class="flag">🇺🇸</span><span class="name">英文</span>
+    <div class="container">
+        <div class="lang-card">
+            <div class="lang-select-group">
+                <div class="lang-label">說話語言</div>
+                <select id="srcLang">
+                    <option value="zh-TW">中文 (繁體)</option>
+                    <option value="en-US">English</option>
+                    <option value="ja-JP">日本語</option>
+                </select>
+            </div>
+            <button class="swap-btn">⇄</button>
+            <div class="lang-select-group">
+                <div class="lang-label">目標語言</div>
+                <select id="tgtLang">
+                    <option value="en-US">English</option>
+                    <option value="zh-TW">中文 (繁體)</option>
+                    <option value="ja-JP">日本語</option>
+                </select>
+            </div>
         </div>
-        <div class="lang-card" onclick="changeLang('ja', this)">
-            <span class="flag">🇯🇵</span><span class="name">日文</span>
+
+        <div class="display-area">
+            <div class="bubble bubble-src" id="srcText">
+                點擊下方麥克風，開始說話...
+            </div>
+            <div class="bubble bubble-target" id="tgtText">
+                Translation will appear here...
+            </div>
         </div>
-        <div class="lang-card" onclick="changeLang('vi', this)">
-            <span class="flag">🇻🇳</span><span class="name">越南文</span>
-        </div>
-        <div class="lang-card" onclick="changeLang('th', this)">
-            <span class="flag">🇹🇭</span><span class="name">泰文</span>
+
+        <div class="control-section">
+            <div class="mic-wrapper">
+                <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎙</button>
+                <div class="pulse-ring"></div>
+            </div>
+            <p id="statusHint" style="color: var(--text-muted); font-size: 14px;">等待指令</p>
         </div>
     </div>
 
-    <div class="display-panel">
-        <div class="panel-label"><span>●</span> 偵測來源：中文 (繁體)</div>
-        <div id="originalBox" class="output-text">等待語音輸入...</div>
-    </div>
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span>🏠</span>
+            <span>翻譯</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span>🕒</span>
+            <span>紀錄</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span>⚙️</span>
+            <span>設定</span>
+        </a>
+    </nav>
 
-    <div class="display-panel">
-        <div class="panel-label" id="targetLabel" style="color: var(--primary);"><span>●</span> 目標翻譯：英文 (EN)</div>
-        <div id="targetBox" class="output-text translation-text">Translation will appear here...</div>
-    </div>
-</div>
+    <script>
+        let isRecording = false;
+        const micBtn = document.getElementById('micBtn');
+        const statusHint = document.getElementById('statusHint');
+        const viz = document.getElementById('viz');
 
-<div class="footer-controls">
-    <button id="micBtn" class="mic-btn" onclick="toggleSpeech()">
-        <span id="micIcon">🎤</span> <span id="btnText">開始語音辨識</span>
-    </button>
-</div>
-
-<script>
-    // 安全檢查：麥克風權限環境
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-        document.getElementById('alert-box').style.display = 'block';
-    }
-
-    // 語音辨識核心
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    let isRecording = false;
-
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'zh-TW';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        recognition.onresult = (event) => {
-            const result = event.results[event.results.length - 1][0].transcript;
-            document.getElementById('originalBox').innerText = result;
-            // 模擬翻譯聯動
-            document.getElementById('targetBox').innerText = "[翻譯] " + result;
-        };
-
-        recognition.onerror = (e) => {
-            console.error(e.error);
-            if(e.error === 'not-allowed') alert("請點擊瀏覽器左上方『鎖頭』允許麥克風權限");
-            resetUI();
-        };
-
-        recognition.onend = () => { if(isRecording) recognition.start(); }; // 斷線重連
-    }
-
-    function toggleSpeech() {
-        if (!recognition) return alert("您的瀏覽器不支援此功能");
-        
-        const btn = document.getElementById('micBtn');
-        const txt = document.getElementById('btnText');
-
-        if (!isRecording) {
-            recognition.start();
-            isRecording = true;
-            btn.classList.add('recording');
-            txt.innerText = "正在聆聽中...";
-            if (navigator.vibrate) navigator.vibrate(50);
-        } else {
-            recognition.stop();
-            isRecording = false;
-            resetUI();
+        function toggleMic() {
+            isRecording = !isRecording;
+            if (isRecording) {
+                micBtn.classList.add('active');
+                micBtn.innerHTML = '⏹';
+                statusHint.textContent = '正在聆聽...';
+                statusHint.style.color = '#ef4444';
+                viz.style.opacity = '1';
+            } else {
+                micBtn.classList.remove('active');
+                micBtn.innerHTML = '🎙';
+                statusHint.textContent = '點擊開始錄音';
+                statusHint.style.color = '#94a3b8';
+                viz.style.opacity = '0.3';
+            }
         }
-    }
 
-    function resetUI() {
-        const btn = document.getElementById('micBtn');
-        btn.classList.remove('recording');
-        document.getElementById('btnText').innerText = "開始語音辨識";
-    }
-
-    function changeLang(lang, el) {
-        document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        const labels = { en: '英文 (EN)', ja: '日文 (JA)', vi: '越南文 (VI)', th: '泰文 (TH)' };
-        document.getElementById('targetLabel').innerText = `● 目標翻譯：${labels[lang]}`;
-        if (navigator.vibrate) navigator.vibrate(20);
-    }
-</script>
-
+        // 初始化視覺動畫隱藏
+        viz.style.opacity = '0.3';
+    </script>
 </body>
 </html>
